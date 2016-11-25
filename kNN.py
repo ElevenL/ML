@@ -15,10 +15,10 @@ class kNN():
     def classify(self, initX, dataSet, labels, k):
         '''
         k近邻分类函数
-        :param initX: 待分类数据
-        :param dataSet: 训练数据集
-        :param labels: 训练数据集的标签
-        :param k: k值
+        :param initX: array, 待分类数据
+        :param dataSet: array, 训练数据集
+        :param labels: array, 训练数据集的标签
+        :param k: int, k值
         :return: 分类结果标签
         '''
         distance = sum((dataSet - initX) ** 2, axis=1) ** 0.5   #计算距离
