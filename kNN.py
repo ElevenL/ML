@@ -11,6 +11,13 @@ class kNN():
         labels = ['A', 'A', 'B', 'B']
         return  group,labels
 
+    # 特征归一化处理
+    def featureNorm(self, dataSet):
+        max = dataSet.max(axis=0)
+        min = dataSet.min(axis=0)
+        range = max - min
+        return (dataSet - min) / range
+
     # 分类函数
     def classify(self, initX, dataSet, labels, k):
         '''
@@ -21,8 +28,9 @@ class kNN():
         :param k: int, k值
         :return: 分类结果标签
         '''
-        distance = sum((dataSet - initX) ** 2, axis=1) ** 0.5   #计算距离
-        sortedDistance = distance.argsort()     #根据距离升序排序，并返回index
+        newSet = self.featureNorm(dataSet)      # 特征归一化
+        distance = sum((newSet - initX) ** 2, axis=1) ** 0.5   # 计算距离
+        sortedDistance = distance.argsort()     # 根据距离升序排序，并返回index
 
         # 计算距离最近的K个样本中，每个标签类的样本个数
         classCounte = {}
@@ -38,4 +46,4 @@ class kNN():
 if __name__=='__main__':
     C = kNN()
     dataSet,labels = C.createData()
-    print C.classify([1.1, 1.2], dataSet, labels, 3)
+    print C.classify([1.1, 1.5], dataSet, labels, 3)
