@@ -1,5 +1,6 @@
+#!coding=utf-8
 import numpy as np
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import pandas as pd
 import scipy.io #Used to load the OCTAVE *.mat files
 import scipy.misc #Used to show matrix as an image
@@ -11,13 +12,13 @@ from scipy.special import expit #Vectorized sigmoid function
 
 
 class NN:
-    def __init__(self, X, y):
+    def __init__(self, X, y, classNum):
         self.X = X
         self.y = y
-
+        self.classNum = classNum
         self.input_layer_size = 400
         self.hidden_layer_size = 25
-        self.output_layer_size = 10
+        self.output_layer_size = classNum
         self.n_training_samples = self.X.shape[0]
 
     # Some utility functions. There are lot of flattening and
@@ -126,7 +127,7 @@ class NN:
             # note here if the hand-written digit is "0", then that corresponds
             # to a y- vector with 1 in the 10th spot (different from what the
             # homework suggests)
-            tmpy = np.zeros((2, 1))
+            tmpy = np.zeros((self.classNum, 1))
             tmpy[myy[irow] -1 ] = 1
 
             # Compute the cost for this point and y-vector
@@ -182,7 +183,7 @@ class NN:
             a2 = temp[0][1]
             z3 = temp[1][0]
             a3 = temp[1][1]
-            tmpy = np.zeros((2, 1))
+            tmpy = np.zeros((self.classNum, 1))
             tmpy[myy[irow] - 1] = 1
             delta3 = a3 - tmpy
             delta2 = mythetas[1].T[1:, :].dot(delta3) * self.sigmoidGradient(z2)  # remove 0th element
@@ -231,7 +232,7 @@ class NN:
         Function that takes a row of features, propagates them through the
         NN, and returns the predicted integer that was hand written
         """
-        classes = [1, 2]
+        classes = range(1,self.classNum+1,1)
         output = self.propagateForward(row, Thetas)
         # -1 means last layer, 1 means "a" instead of "z"
         # print classes[np.argmax(output[-1][1])]
@@ -251,7 +252,7 @@ class NN:
 
 
 if __name__ == '__main__':
-    datafile = 'ex3/data/ex3data1.mat'
+    datafile = 'data/ex3data1.mat'
     mat = scipy.io.loadmat(datafile)
     X, y = mat['X'], mat['y']
     # Insert a column of 1's to X as usual
@@ -259,21 +260,21 @@ if __name__ == '__main__':
     print "'y' shape: %s. Unique elements in y: %s" % (mat['y'].shape, np.unique(mat['y']))
     print "'X' shape: %s. X[0] shape: %s" % (X.shape, X[0].shape)
 
-    datafile = 'ex3/data/ex3weights.mat'
+    datafile = 'data/ex3weights.mat'
     mat = scipy.io.loadmat(datafile)
     Theta1, Theta2 = mat['Theta1'], mat['Theta2']
 
-    nn = NN(X, y)
-    print nn.input_layer_size
-
-    myThetas = [Theta1, Theta2]
-
-    print nn.computeCost(nn.flattenParams(myThetas), nn.flattenX(nn.X), nn.y, mylambda=1.)
-
-    flattenedD1D2 = nn.backPropagate(nn.flattenParams(myThetas), nn.flattenX(nn.X), nn.y, mylambda=0.)
-    D1, D2 = nn.reshapeParams(flattenedD1D2)
-
-    nn.checkGradient(myThetas, [D1, D2], nn.X, nn.y)
+    nn = NN(X, y, 10)
+    # print nn.input_layer_size
+    #
+    # myThetas = [Theta1, Theta2]
+    #
+    # print nn.computeCost(nn.flattenParams(myThetas), nn.flattenX(nn.X), nn.y, mylambda=1.)
+    #
+    # flattenedD1D2 = nn.backPropagate(nn.flattenParams(myThetas), nn.flattenX(nn.X), nn.y, mylambda=0.)
+    # D1, D2 = nn.reshapeParams(flattenedD1D2)
+    #
+    # nn.checkGradient(myThetas, [D1, D2], nn.X, nn.y)
 
     learned_Thetas = nn.trainNN()
     nn.computeAccuracy(nn.X, learned_Thetas, nn.y)
